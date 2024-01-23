@@ -1,6 +1,7 @@
 use crate::ctx::Ctx;
 use crate::log::log_request;
 use crate::web;
+use crate::web::rpc::RpcInfo;
 use axum::http::{Method, Uri};
 use axum::response::{IntoResponse, Response};
 use axum::Json;
@@ -8,7 +9,6 @@ use serde_json::{json, to_value};
 use std::sync::Arc;
 use tracing::debug;
 use uuid::Uuid;
-use crate::web::rpc::RpcInfo;
 
 pub async fn mw_response_map(
 	ctx: Option<Ctx>,
@@ -19,7 +19,7 @@ pub async fn mw_response_map(
 	debug!("{:<12} - mw_response_map", "RES_MAPPER");
 	let uuid = Uuid::new_v4();
 
-	let rpc_info = res.extensions().get::<RpcInfo>();
+	let rpc_info = res.extensions().get::<Arc<RpcInfo>>().map(Arc::as_ref);
 
 	// -- Get the eventual response error.
 	let web_error = res.extensions().get::<Arc<web::Error>>().map(Arc::as_ref);
@@ -34,6 +34,7 @@ pub async fn mw_response_map(
 				let message = client_error.as_ref().and_then(|v| v.get("message"));
 				let detail = client_error.as_ref().and_then(|v| v.get("detail"));
 				let client_error_body = json!({
+					"id": rpc_info.as_ref().map(|rpc| rpc.id.clone()),
 					"error": {
 						"message": message,
 						"data": {
@@ -53,7 +54,16 @@ pub async fn mw_response_map(
 	let client_error = client_status_error.unzip().1;
 
 	// TODO: Need to handle if log_request fail (but should not fail request)
-	let _ = log_request(uuid, req_method, uri, rpc_info, ctx, web_error, client_error).await;
+	let _ = log_request(
+		uuid,
+		req_method,
+		uri,
+		rpc_info,
+		ctx,
+		web_error,
+		client_error,
+	)
+	.await;
 
 	debug!("\n");
 
