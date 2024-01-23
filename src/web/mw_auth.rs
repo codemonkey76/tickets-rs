@@ -1,6 +1,8 @@
 use crate::ctx::Ctx;
+use crate::model::user::{UserBmc, UserForAuth};
 use crate::model::ModelManager;
-use crate::web::{AUTH_TOKEN, set_token_cookie};
+use crate::pwd::token::{validate_web_token, Token};
+use crate::web::{set_token_cookie, AUTH_TOKEN};
 use crate::web::{Error, Result};
 use async_trait::async_trait;
 use axum::body::Body;
@@ -12,8 +14,6 @@ use axum::response::Response;
 use serde::Serialize;
 use tower_cookies::{Cookie, Cookies};
 use tracing::debug;
-use crate::crypt::token::{Token, validate_web_token};
-use crate::model::user::{UserBmc, UserForAuth};
 
 #[allow(dead_code)] // For now, until we have the rpc.
 pub async fn mw_ctx_require(
@@ -39,7 +39,8 @@ pub async fn mw_ctx_resolve(
 	let ctx_ext_result = _ctx_resolve(mm, &cookies).await;
 
 	if ctx_ext_result.is_err()
-		&& !matches!(ctx_ext_result, Err(CtxExtError::TokenNotInCookie)) {
+		&& !matches!(ctx_ext_result, Err(CtxExtError::TokenNotInCookie))
+	{
 		cookies.remove(Cookie::from(AUTH_TOKEN));
 	}
 
@@ -50,7 +51,7 @@ pub async fn mw_ctx_resolve(
 	Ok(next.run(req).await)
 }
 
-async fn _ctx_resolve(mm: State<ModelManager>, cookies: &Cookies,) -> CtxExtResult {
+async fn _ctx_resolve(mm: State<ModelManager>, cookies: &Cookies) -> CtxExtResult {
 	// -- Get Token String
 	let token = cookies
 		.get(AUTH_TOKEN)
@@ -58,14 +59,16 @@ async fn _ctx_resolve(mm: State<ModelManager>, cookies: &Cookies,) -> CtxExtResu
 		.ok_or(CtxExtError::TokenNotInCookie)?;
 
 	// -- Parse Token
-	let token = token.parse::<Token>()
+	let token = token
+		.parse::<Token>()
 		.map_err(|_| CtxExtError::TokenWrongFormat)?;
 
 	// -- Get UserForAuth
-	let user: UserForAuth = UserBmc::first_by_username(&Ctx::root_ctx(), &mm, &token.ident)
-		.await
-		.map_err(|ex| CtxExtError::ModelAccessError(ex.to_string()))?
-		.ok_or(CtxExtError::UserNotFound)?;
+	let user: UserForAuth =
+		UserBmc::first_by_username(&Ctx::root_ctx(), &mm, &token.ident)
+			.await
+			.map_err(|ex| CtxExtError::ModelAccessError(ex.to_string()))?
+			.ok_or(CtxExtError::UserNotFound)?;
 
 	// -- Validate Token
 	validate_web_token(&token, &user.token_salt.to_string())

@@ -1,39 +1,32 @@
-use crate::crypt;
 use crate::model::store;
+use crate::pwd;
+use derive_more::From;
 use serde::Serialize;
 use serde_with::{serde_as, DisplayFromStr};
 
 pub type Result<T> = core::result::Result<T, Error>;
 
 #[serde_as]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, From)]
 pub enum Error {
-	EntityNotFound { entity: &'static str, id: i64 },
+	EntityNotFound {
+		entity: &'static str,
+		id: i64,
+	},
+
 	// -- Modules
-	Crypt(crypt::Error),
+	#[from]
+	Pwd(pwd::Error),
+	#[from]
 	Store(store::Error),
 
 	// -- Externals
+	#[from]
 	Sqlx(#[serde_as(as = "DisplayFromStr")] sqlx::Error),
-}
 
-// region:    --- Froms
-impl From<crypt::Error> for Error {
-	fn from(value: crypt::Error) -> Self {
-		Self::Crypt(value)
-	}
+	#[from]
+	SeaQuery(#[serde_as(as = "DisplayFromStr")] sea_query::error::Error),
 }
-impl From<store::Error> for Error {
-	fn from(value: store::Error) -> Self {
-		Self::Store(value)
-	}
-}
-impl From<sqlx::Error> for Error {
-	fn from(value: sqlx::Error) -> Self {
-		Self::Sqlx(value)
-	}
-}
-// endregion: --- Froms
 
 // region:    --- Error Boilerplate
 impl std::fmt::Display for Error {

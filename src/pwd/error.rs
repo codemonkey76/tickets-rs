@@ -7,7 +7,7 @@ pub enum Error {
 	// Key
 	KeyFailHmac,
 
-	// -- Pwd
+	// -- pwd
 	PwdNotMatching,
 
 	// -- Token
@@ -16,7 +16,7 @@ pub enum Error {
 	TokenCannotDecodeExp,
 	TokenSignatureNotMatching,
 	TokenExpNotIso,
-	TokenExpired
+	TokenExpired,
 }
 
 // region:    --- Error Boilerplate

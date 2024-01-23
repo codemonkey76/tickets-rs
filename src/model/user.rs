@@ -1,13 +1,22 @@
-use crate::crypt::{pwd, EncryptContent};
 use crate::ctx::Ctx;
 use crate::model::base::{self, DbBmc};
 use crate::model::ModelManager;
 use crate::model::{Error, Result};
+use crate::pwd::{pwd, EncryptContent};
+use modql::field::{Fields, HasFields};
+use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, SimpleExpr};
+use sea_query_binder::SqlxBinder;
 use serde::{Deserialize, Serialize};
-use sqlb::{Fields, HasFields};
 use sqlx::postgres::PgRow;
 use sqlx::FromRow;
 use uuid::Uuid;
+
+#[derive(Iden)]
+enum UserIden {
+	Id,
+	Username,
+	Pwd,
+}
 
 // region:    --- User Types
 
@@ -80,10 +89,18 @@ impl UserBmc {
 	{
 		let db = mm.db();
 
-		let user = sqlb::select()
-			.table(Self::TABLE)
-			.and_where("username", "=", username)
-			.fetch_optional::<_, E>(db)
+		// -- Build query
+		let mut query = Query::select();
+
+		query
+			.from(Self::table_ref())
+			.columns(E::field_idens())
+			.and_where(Expr::col(UserIden::Username).eq(username));
+
+		// -- Exec query
+		let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
+		let user = sqlx::query_as_with::<_, E, _>(&sql, values)
+			.fetch_optional(db)
 			.await?;
 
 		Ok(user)
@@ -99,17 +116,26 @@ impl UserBmc {
 
 		let user: UserForLogin = Self::get(ctx, mm, id).await?;
 
+		// -- Prep password
 		let pwd = pwd::encrypt_pwd(&EncryptContent {
 			content: pwd_clear.to_string(),
 			salt: user.pwd_salt.to_string(),
 		})?;
 
-		sqlb::update()
-			.table(Self::TABLE)
-			.and_where("id", "=", id)
-			.data(vec![("pwd", pwd.to_string()).into()])
-			.exec(db)
-			.await?;
+		// -- Build query
+		let mut query = Query::update();
+
+		query
+			.table(Self::table_ref())
+			.value(UserIden::Pwd, SimpleExpr::from(pwd))
+			.and_where(Expr::col(UserIden::Id).eq(id));
+
+		// -- Exec query
+		let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
+		let _count = sqlx::query_with(&sql, values)
+			.execute(db)
+			.await?
+			.rows_affected();
 
 		Ok(())
 	}

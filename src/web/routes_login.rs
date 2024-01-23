@@ -1,8 +1,8 @@
-use crate::crypt::{pwd, EncryptContent};
 use crate::ctx::Ctx;
 use crate::model::user::{UserBmc, UserForLogin};
 use crate::model::ModelManager;
-use crate::web::{self, Error, remove_token_cookie, Result};
+use crate::pwd::{pwd, EncryptContent};
+use crate::web::{self, remove_token_cookie, Error, Result};
 use axum::extract::State;
 use axum::routing::post;
 use axum::{Json, Router};
@@ -75,7 +75,7 @@ struct LoginPayload {
 // region:    --- Logout
 async fn api_logoff_handler(
 	cookies: Cookies,
-	Json(payload): Json<LogoffPayload>
+	Json(payload): Json<LogoffPayload>,
 ) -> Result<Json<Value>> {
 	debug!("{:<12} - api_logoff_handler", "HANDLER");
 	let should_logoff = payload.logoff;
@@ -92,10 +92,9 @@ async fn api_logoff_handler(
 	}));
 
 	Ok(body)
-
 }
 #[derive(Debug, Deserialize)]
 struct LogoffPayload {
-	logoff: bool
+	logoff: bool,
 }
 // endregion: --- Logout

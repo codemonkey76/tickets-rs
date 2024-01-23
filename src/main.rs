@@ -3,11 +3,11 @@
 // region:    --- Modules
 
 mod config;
-mod crypt;
 mod ctx;
 mod error;
 mod log;
 mod model;
+mod pwd;
 mod web;
 
 pub mod _dev_utils;
@@ -20,9 +20,9 @@ use crate::model::ModelManager;
 use crate::web::mw_auth::{mw_ctx_require, mw_ctx_resolve};
 use crate::web::mw_res_map::mw_response_map;
 use crate::web::{routes_login, routes_static, rpc};
-use axum::{middleware, Router};
 use axum::response::Html;
 use axum::routing::get;
+use axum::{middleware, Router};
 use tokio::net::TcpListener;
 use tower_cookies::CookieManagerLayer;
 use tracing::{debug, info};
@@ -44,9 +44,8 @@ async fn main() -> Result<()> {
 	let mm = ModelManager::new().await?;
 
 	// -- Define routes
-	let routes_rpc = rpc::routes(mm.clone())
-	     .route_layer(middleware::from_fn(mw_ctx_require));
-
+	let routes_rpc =
+		rpc::routes(mm.clone()).route_layer(middleware::from_fn(mw_ctx_require));
 
 	let routes_all = Router::new()
 		.merge(routes_login::routes(mm.clone()))

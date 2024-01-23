@@ -7,14 +7,17 @@ edition = "2021"
 async-trait = "0.1.77"
 axum = { version = "0.7.4", features = ["macros"] }
 base64-url = "2.0.2"
+derive_more = { version = "0.99.17", features = ["from"] }
 hmac = "0.12.1"
 lazy-regex = "3.1.0"
+modql = { version = "0.3.7", features = ["with-sea-query"] }
 rand = "0.8.5"
+sea-query = "0.30.7"
+sea-query-binder = { version = "0.5.0", features = ["sqlx-postgres", "with-uuid"] }
 serde = { version = "1.0.195", features = ["derive"] }
 serde_json = "1.0.111"
 serde_with = "3.5.0"
 sha2 = "0.10.8"
-sqlb = "0.4.0"
 sqlx = { version = "0.7.3", features = ["runtime-tokio-rustls", "postgres", "uuid", "time"] }
 strum_macros = { version = "0.25.3", features = [] }
 time = "0.3.31"

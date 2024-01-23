@@ -1,6 +1,8 @@
 use crate::config;
-use crate::crypt::{encrypt_into_b64u, EncryptContent, Error, Result};
-use crate::utils::{b64u_decode, b64u_encode, now_utc, now_utc_plus_sec_str, parse_utc};
+use crate::pwd::{encrypt_into_b64u, EncryptContent, Error, Result};
+use crate::utils::{
+	b64u_decode, b64u_encode, now_utc, now_utc_plus_sec_str, parse_utc,
+};
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
@@ -79,7 +81,11 @@ fn _generate_token(
 	// -- Sign the first two components.
 	let sign_b64u = _token_sign_into_b64u(&ident, &exp, salt, key)?;
 
-	Ok(Token { ident, exp, sign_b64u })
+	Ok(Token {
+		ident,
+		exp,
+		sign_b64u,
+	})
 }
 
 fn _validate_token_sign_and_exp(
@@ -87,14 +93,16 @@ fn _validate_token_sign_and_exp(
 	salt: &str,
 	key: &[u8],
 ) -> Result<()> {
-	let new_sign_b64u = _token_sign_into_b64u(&origin_token.ident, &origin_token.exp, salt, key)?;
+	let new_sign_b64u =
+		_token_sign_into_b64u(&origin_token.ident, &origin_token.exp, salt, key)?;
 
 	if new_sign_b64u != origin_token.sign_b64u {
 		return Err(Error::TokenSignatureNotMatching);
 	}
 
 	// -- Validate Expiration
-	let origin_exp = parse_utc(&origin_token.exp).map_err(|_| Error::TokenExpNotIso)?;
+	let origin_exp =
+		parse_utc(&origin_token.exp).map_err(|_| Error::TokenExpNotIso)?;
 
 	let now_utc = now_utc();
 
@@ -117,8 +125,8 @@ fn _token_sign_into_b64u(
 		key,
 		&EncryptContent {
 			content,
-			salt: salt.to_string()
-		}
+			salt: salt.to_string(),
+		},
 	)?;
 
 	Ok(signature)
@@ -129,10 +137,10 @@ fn _token_sign_into_b64u(
 // region:    --- Tests
 #[cfg(test)]
 mod tests {
-	use std::thread;
-	use std::time::Duration;
 	use super::*;
 	use anyhow::Result;
+	use std::thread;
+	use std::time::Duration;
 
 	#[test]
 	fn test_token_display_ok() -> Result<()> {
@@ -177,7 +185,8 @@ mod tests {
 		let fx_salt = "pepper";
 		let fx_duration_sec = 0.02; // 20ms
 		let token_key = &config().TOKEN_KEY;
-		let fx_token = _generate_token(fx_user, fx_duration_sec, fx_salt, token_key)?;
+		let fx_token =
+			_generate_token(fx_user, fx_duration_sec, fx_salt, token_key)?;
 
 		// -- Exec
 		thread::sleep(Duration::from_millis(10));
@@ -196,7 +205,8 @@ mod tests {
 		let fx_salt = "pepper";
 		let fx_duration_sec = 0.01; // 10ms
 		let token_key = &config().TOKEN_KEY;
-		let fx_token = _generate_token(fx_user, fx_duration_sec, fx_salt, token_key)?;
+		let fx_token =
+			_generate_token(fx_user, fx_duration_sec, fx_salt, token_key)?;
 
 		// -- Exec
 		thread::sleep(Duration::from_millis(20));

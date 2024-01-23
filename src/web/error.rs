@@ -1,15 +1,15 @@
+use crate::web::Error::Model;
 use crate::web::Error::{
 	CtxExt, LoginFailPwdNotMatching, LoginFailUserHasNoPwd,
 	LoginFailUsernameNotFound,
 };
-use crate::{crypt, model, web};
+use crate::{model, pwd, web};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use serde::Serialize;
 use std::fmt::Formatter;
 use std::sync::Arc;
 use tracing::debug;
-use crate::web::Error::Model;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
@@ -31,10 +31,10 @@ pub enum Error {
 
 	// -- Modules
 	Model(model::Error),
-	Crypt(crypt::Error),
+	Crypt(pwd::Error),
 
 	// -- External Modules
-	SerdeJson(String)
+	SerdeJson(String),
 }
 
 // region:    --- Froms
@@ -43,8 +43,8 @@ impl From<serde_json::Error> for Error {
 		Self::SerdeJson(value.to_string())
 	}
 }
-impl From<crypt::Error> for Error {
-	fn from(value: crypt::Error) -> Self {
+impl From<pwd::Error> for Error {
+	fn from(value: pwd::Error) -> Self {
 		Self::Crypt(value)
 	}
 }
@@ -98,7 +98,7 @@ impl Error {
 			// -- Model
 			Model(model::Error::EntityNotFound { entity, id }) => (
 				StatusCode::BAD_REQUEST,
-				ClientError::ENTITY_NOT_FOUND { entity, id: *id }
+				ClientError::ENTITY_NOT_FOUND { entity, id: *id },
 			),
 			// -- Fallback.
 			_ => (
