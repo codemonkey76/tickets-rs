@@ -21,20 +21,20 @@ ALTER DATABASE postgres SET log_statement = 'all';
 
 ```sh
 # Terminal 1 - To run the server.
-cargo watch -q -c -w crates/services/web-server/src/ -w crates/libs/ -w .cargo/ -x "run -p web-server"
+cargo watch -q -c -w src/ -w .cargo/ -x run
 
 # Terminal 2 - To run the quick_dev.
-cargo watch -q -c -w crates/services/web-server/examples/ -x "run -p web-server --example quick_dev"
+cargo watch -q -c -w examples/ -x "run ---example quick_dev"
 ```
 
 ## Dev
 
 ```sh
 # Terminal 1 - To run the server.
-cargo run -p web-server
+cargo run
 
 # Terminal 2 - To run the tests.
-cargo run -p web-server --example quick_dev
+cargo run --example quick_dev
 ```
 
 ## Unit Test (watch)

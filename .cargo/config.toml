@@ -13,6 +13,10 @@ RUST_LOG = "tickets=debug"
 # i.e., Encryption not needed.
 SERVICE_DB_URL = "postgres://app_user:dev_only_pwd@localhost/app_db"
 
+SERVICE_PWD_KEY="KoaZrGX7pUTNdq35A0txw-hmlAjEbD_CiJr_STHDBy4oM8U6ZrVVQeIONohAd7OUKkdJlGAG7Sn4nLBDpDcNKw"
+SERVICE_TOKEN_KEY="vLe2kXY2My0WNllqcwzSUrpfFQjBvSU7ABnsgnXOIu6BRpZ5DkhHhwoDd87fstLxrtGDsTVUx2_FSzIHuUqSEg"
+
+SERVICE_TOKEN_DURATION_SEC="1800" # 30 Minutes
 ## -- ConfigMap
 
 # This will be relative to Cargo.toml

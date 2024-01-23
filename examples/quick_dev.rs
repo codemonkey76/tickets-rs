@@ -13,9 +13,10 @@ async fn main() -> Result<()> {
 		"/api/login",
 		json!({
 			"username": "demo1",
-			"password": "password"
+			"password": "welcome2"
 		}),
 	);
+
 	req_login.await?.print().await?;
 
 	Ok(())
