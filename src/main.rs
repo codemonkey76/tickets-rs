@@ -11,6 +11,7 @@ mod model;
 mod web;
 
 pub mod _dev_utils;
+mod utils;
 
 pub use self::error::{Error, Result};
 pub use config::config;

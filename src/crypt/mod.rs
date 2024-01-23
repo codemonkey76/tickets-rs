@@ -2,6 +2,7 @@
 
 mod error;
 pub mod pwd;
+pub mod token;
 
 pub use self::error::{Error, Result};
 
@@ -59,7 +60,7 @@ mod tests {
 
 		// -- Exec
 		let res = encrypt_into_b64u(&fx_key, &fx_enc_content)?;
-		println!("->> {res}");
+
 		// -- Check
 		assert_eq!(res, fx_res);
 

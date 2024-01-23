@@ -17,6 +17,7 @@ sha2 = "0.10.8"
 sqlb = "0.4.0"
 sqlx = { version = "0.7.3", features = ["runtime-tokio-rustls", "postgres", "uuid", "time"] }
 strum_macros = { version = "0.25.3", features = [] }
+time = "0.3.31"
 tokio = { version = "1.35.1", features = ["full"] }
 tower-cookies = "0.10.0"
 tower-http = { version = "0.5.1", features = ["fs"] }
