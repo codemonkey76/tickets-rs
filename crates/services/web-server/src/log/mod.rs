@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use crate::web::routes_rpc::RpcInfo;
 use crate::web::{self, ClientError};
 use crate::Result;
@@ -14,9 +15,9 @@ pub async fn log_request(
 	uuid: Uuid,
 	req_method: Method,
 	uri: Uri,
-	rpc_info: Option<&RpcInfo>,
+	rpc_info: Option<&Arc<RpcInfo>>,
 	ctx: Option<Ctx>,
-	web_error: Option<&web::Error>,
+	web_error: Option<&Arc<web::Error>>,
 	client_error: Option<ClientError>,
 ) -> Result<()> {
 	let timestamp = SystemTime::now()

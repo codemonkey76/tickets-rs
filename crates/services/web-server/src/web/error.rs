@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use crate::web;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
@@ -39,7 +40,7 @@ pub enum Error {
 
 	// -- External Modules
 	#[from]
-	SerdeJson(#[serde_as(as = "DisplayFromStr")] serde_json::Error),
+	SerdeJson(#[serde_as(as = "DisplayFromStr")] Arc<serde_json::Error>),
 }
 
 // region:    --- Axum IntoResponse
@@ -47,11 +48,11 @@ impl IntoResponse for Error {
 	fn into_response(self) -> Response {
 		debug!("{:<12} - model::Error {self:?}", "INTO_RES");
 
-		// Create a placeholder Axum reponse.
+		// Create a placeholder Axum response.
 		let mut response = StatusCode::INTERNAL_SERVER_ERROR.into_response();
 
-		// Insert the Error into the reponse.
-		response.extensions_mut().insert(self);
+		// Insert the Error into the response.
+		response.extensions_mut().insert(Arc::new(self));
 
 		response
 	}
