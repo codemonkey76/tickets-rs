@@ -10,7 +10,7 @@ use std::sync::Arc;
 use tracing::debug;
 use uuid::Uuid;
 
-pub async fn mw_reponse_map(
+pub async fn mw_response_map(
 	ctx: Option<CtxW>,
 	uri: Uri,
 	req_method: Method,
@@ -18,7 +18,7 @@ pub async fn mw_reponse_map(
 ) -> Response {
 	let ctx = ctx.map(|ctx| ctx.0);
 
-	debug!("{:<12} - mw_reponse_map", "RES_MAPPER");
+	debug!("{:<12} - mw_response_map", "RES_MAPPER");
 	let uuid = Uuid::new_v4();
 
 	let rpc_info = res.extensions().get::<Arc<RpcInfo>>();
@@ -27,7 +27,7 @@ pub async fn mw_reponse_map(
 	let web_error = res.extensions().get::<Arc<web::Error>>();
 	let client_status_error = web_error.map(|se| se.client_status_and_error());
 
-	// -- If client error, build the new reponse.
+	// -- If client error, build the new response.
 	let error_response =
 		client_status_error
 			.as_ref()
@@ -55,14 +55,14 @@ pub async fn mw_reponse_map(
 
 	// -- Build and log the server log line.
 	let client_error = client_status_error.unzip().1;
-	// TODO: Need to hander if log_request fail (but should not fail request)
+	// TODO: Need to handler if log_request fail (but should not fail request)
 	let _ = log_request(
 		uuid,
 		req_method,
 		uri,
-		rpc_info,
+		rpc_info.map(Arc::as_ref),
 		ctx,
-		web_error,
+		web_error.map(Arc::as_ref),
 		client_error,
 	)
 	.await;
