@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use crate::web;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
@@ -7,6 +6,7 @@ use lib_auth::{pwd, token};
 use lib_core::model;
 use serde::Serialize;
 use serde_with::{serde_as, DisplayFromStr};
+use std::sync::Arc;
 use tracing::debug;
 
 pub type Result<T> = core::result::Result<T, Error>;
@@ -40,7 +40,7 @@ pub enum Error {
 
 	// -- External Modules
 	#[from]
-	SerdeJson(#[serde_as(as = "DisplayFromStr")] Arc<serde_json::Error>),
+	SerdeJson(#[serde_as(as = "DisplayFromStr")] serde_json::Error),
 }
 
 // region:    --- Axum IntoResponse
