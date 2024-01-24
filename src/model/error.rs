@@ -9,6 +9,11 @@ pub type Result<T> = core::result::Result<T, Error>;
 #[serde_as]
 #[derive(Debug, Serialize, From)]
 pub enum Error {
+	ListLimitOverMax {
+		max: i64,
+		actual: i64,
+	},
+
 	EntityNotFound {
 		entity: &'static str,
 		id: i64,
@@ -26,6 +31,9 @@ pub enum Error {
 
 	#[from]
 	SeaQuery(#[serde_as(as = "DisplayFromStr")] sea_query::error::Error),
+
+	#[from]
+	ModqlIntoSea(#[serde_as(as = "DisplayFromStr")] modql::filter::IntoSeaError),
 }
 
 // region:    --- Error Boilerplate
