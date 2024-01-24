@@ -1,3 +1,2 @@
 -- User demo1
-INSERT INTO "user" (username)
-values ('demo1');
+INSERT INTO "user" (username) VALUES ('demo1');

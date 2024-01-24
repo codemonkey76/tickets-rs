@@ -1,34 +1,19 @@
-[package]
-name = "tickets"
-version = "0.1.0"
-edition = "2021"
+[workspace.lints.rust]
+unsafe_code = "forbid"
+# unused = "allow" # For experimental dev.
 
-[dependencies]
-async-trait = "0.1.77"
-axum = { version = "0.7.4", features = ["macros"] }
-base64-url = "2.0.2"
-derive_more = { version = "0.99.17", features = ["from"] }
-hmac = "0.12.1"
-lazy-regex = "3.1.0"
-modql = { version = "0.3.7", features = ["with-sea-query"] }
-rand = "0.8.5"
-sea-query = "0.30.7"
-sea-query-binder = { version = "0.5.0", features = ["sqlx-postgres", "with-uuid"] }
-serde = { version = "1.0.195", features = ["derive"] }
-serde_json = "1.0.111"
-serde_with = "3.5.0"
-sha2 = "0.10.8"
-sqlx = { version = "0.7.3", features = ["runtime-tokio-rustls", "postgres", "uuid", "time"] }
-strum_macros = { version = "0.25.3", features = [] }
-time = "0.3.31"
-tokio = { version = "1.35.1", features = ["full"] }
-tower-cookies = "0.10.0"
-tower-http = { version = "0.5.1", features = ["fs"] }
-tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-uuid = { version = "1.7.0", features = ["v4", "fast-rng"] }
+[workspace]
+resolver = "2"
+members = [
+    # -- Application Libraries
+    "crates/libs/lib-utils", # e.g., base64, time.
+    "crates/libs/lib-rpc", # e.g., rpc routing.
+    "crates/libs/lib-auth", # e.g., for pwd, token.
+    "crates/libs/lib-core", # e.g., model, ctx, config.
 
-[dev-dependencies]
-anyhow = "1.0.79"
-httpc-test = "0.1.8"
-serial_test = "3.0.0"
+    # -- Application Services
+    "crates/services/web-server",
+
+    # -- Tools
+    "crates/tools/gen-key",    
+]

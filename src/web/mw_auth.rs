@@ -1,7 +1,7 @@
 use crate::ctx::Ctx;
 use crate::model::user::{UserBmc, UserForAuth};
 use crate::model::ModelManager;
-use crate::pwd::token::{validate_web_token, Token};
+use crate::pwd::r#mod::{validate_web_token, Token};
 use crate::web::{set_token_cookie, AUTH_TOKEN};
 use crate::web::{Error, Result};
 use async_trait::async_trait;
