@@ -5,6 +5,13 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/libs/lib-auth/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/libs/lib-core/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/libs/lib-rpc/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/libs/lib-utils/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/services/web-server/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/services/web-server/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/tools/gen-key/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
